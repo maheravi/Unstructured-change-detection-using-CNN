@@ -23,8 +23,8 @@ def get_activations(model, layer_idx, X_batch):
 def extra_feat(img_path):
         #Using a VGG19 as feature extractor
         base_model = VGG19(weights='imagenet',include_top=False)
-	img = image.load_img(img_path, target_size=(224, 224))
-	x = image.img_to_array(img)
+	img = tf.keras.utils.load_img(img_path, target_size=(224, 224))
+	x = tf.keras.utils.img_to_array(img)
 	x = np.expand_dims(x, axis=0)
 	x = preprocess_input(x)
         block1_pool_features=get_activations(base_model, 3, x)
@@ -43,14 +43,14 @@ def extra_feat(img_path):
         return F
 def main():
   if (len(sys.argv))>3:
-    print "Invalid number of input arguments "
+    print("Invalid number of input arguments")
     exit(0)
 
   #Two aerial patches with change or No change
   img_path1=sys.argv[1]
   img_path2=sys.argv[2]
 
-  sess = tf.InteractiveSession()
+  sess = tf.compat.v1.InteractiveSession()
 
   F1=extra_feat(img_path1) #Features from image patch 1
   F1=tf.square(F1)
