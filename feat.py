@@ -37,13 +37,7 @@ def extra_feat(img_path):
         x2 = tf.image.resize(block2_pool_features[0],[112,112])
         x3 = tf.image.resize(block3_pool_features[0],[112,112])
         x4 = tf.image.resize(block4_pool_features[0],[112,112])
-        x5 = tf.image.resize(block5_pool_features[0],[112,112])
-
-        print(x1.shape)
-        print(x2.shape)
-        print(x3.shape)
-        print(x4.shape)
-        print(x5.shape)        
+        x5 = tf.image.resize(block5_pool_features[0],[112,112])  
         
         # F = tf.concat([x3,x2,x1,x4,x5], axis=3) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
         F = tf.concat([x1,x2,x3,x4,x5], axis=2) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
