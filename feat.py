@@ -23,23 +23,23 @@ def get_activations(model, layer_idx, X_batch):
 def extra_feat(img_path):
         #Using a VGG19 as feature extractor
         base_model = VGG19(weights='imagenet',include_top=False)
-	img = tf.keras.utils.load_img(img_path, target_size=(224, 224))
-	x = tf.keras.utils.img_to_array(img)
-	x = np.expand_dims(x, axis=0)
-	x = preprocess_input(x)
+        img = tf.keras.utils.load_img(img_path, target_size=(224, 224))
+        x = tf.keras.utils.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
         block1_pool_features=get_activations(base_model, 3, x)
         block2_pool_features=get_activations(base_model, 6, x)
         block3_pool_features=get_activations(base_model, 10, x)
         block4_pool_features=get_activations(base_model, 14, x)
         block5_pool_features=get_activations(base_model, 18, x)
 
-	x1 = tf.image.resize_images(block1_pool_features[0],[112,112])
-	x2 = tf.image.resize_images(block2_pool_features[0],[112,112])
-	x3 = tf.image.resize_images(block3_pool_features[0],[112,112])
-	x4 = tf.image.resize_images(block4_pool_features[0],[112,112])
-	x5 = tf.image.resize_images(block5_pool_features[0],[112,112])
-	
-	F = tf.concat([x3,x2,x1,x4,x5],3) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
+        x1 = tf.image.resize_images(block1_pool_features[0],[112,112])
+        x2 = tf.image.resize_images(block2_pool_features[0],[112,112])
+        x3 = tf.image.resize_images(block3_pool_features[0],[112,112])
+        x4 = tf.image.resize_images(block4_pool_features[0],[112,112])
+        x5 = tf.image.resize_images(block5_pool_features[0],[112,112])
+        
+        F = tf.concat([x3,x2,x1,x4,x5],3) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
         return F
 def main():
   if (len(sys.argv))>3:
