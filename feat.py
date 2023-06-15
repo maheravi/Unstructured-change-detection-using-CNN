@@ -12,6 +12,7 @@ import sys
 from skimage import filters #change to 'import filter' for Python>v2.7
 from skimage import exposure
 from keras import backend as K
+from PIL import Image
 
 #Function to retrieve features from intermediate layers
 def get_activations(model, layer_idx, X_batch):
@@ -23,7 +24,7 @@ def get_activations(model, layer_idx, X_batch):
 def extra_feat(img_path):
         #Using a VGG19 as feature extractor
         base_model = VGG19(weights='imagenet',include_top=False)
-        img = load_img(img_path, target_size=(224, 224))
+        img = load_img(img_path, target_size=(640, 640))
         x = img_to_array(img)
         x = np.expand_dims(x, axis=0)
         x = preprocess_input(x)
@@ -33,11 +34,11 @@ def extra_feat(img_path):
         block4_pool_features=get_activations(base_model, 14, x)
         block5_pool_features=get_activations(base_model, 18, x)
 
-        x1 = tf.image.resize(block1_pool_features[0],[112,112])
-        x2 = tf.image.resize(block2_pool_features[0],[112,112])
-        x3 = tf.image.resize(block3_pool_features[0],[112,112])
-        x4 = tf.image.resize(block4_pool_features[0],[112,112])
-        x5 = tf.image.resize(block5_pool_features[0],[112,112])  
+        x1 = tf.image.resize(block1_pool_features[0],[640,640])
+        x2 = tf.image.resize(block2_pool_features[0],[640,640])
+        x3 = tf.image.resize(block3_pool_features[0],[640,640])
+        x4 = tf.image.resize(block4_pool_features[0],[640,640])
+        x5 = tf.image.resize(block5_pool_features[0],[640,640])  
         
         # F = tf.concat([x3,x2,x1,x4,x5], axis=3) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
         F = tf.concat([x1,x2,x3,x4,x5], axis=2) #Change to only x1, x1+x2,x1+x2+x3..so on, inorder to visualize features from diffetrrnt blocks
@@ -63,17 +64,25 @@ def main():
   d=tf.reduce_sum(d,axis=2) 
 
   dis=(d.numpy())   #The change map formed showing change at each pixels
-  dis=np.resize(dis,[112,112])
+  min = np.min(dis)
+  max = np.max(dis)
+  image = (dis - min) / (max - min) * 255
+  im = Image.fromarray(image)
+  im = im.convert("L")
+  im.save("your_file.png")
 
-  # Calculating threshold using Otsu's Segmentation method
-  val = filters.threshold_otsu(dis[:,:])
-  hist, bins_center = exposure.histogram(dis[:,:],nbins=256)
+  # dis=np.resize(dis,[112,112])
 
-  plt.title('Unstructured change')
-  plt.imshow(dis[:,:] < val, cmap='gray', interpolation='bilinear')
-  plt.axis('off')
-  plt.tight_layout()
-  plt.show()
+  # # Calculating threshold using Otsu's Segmentation method
+  # val = filters.threshold_otsu(dis[:,:])
+  # hist, bins_center = exposure.histogram(dis[:,:],nbins=256)
+
+  # plt.title('Unstructured change')
+  # plt.imshow(dis[:,:] < val, cmap='gray', interpolation='bilinear')
+  # plt.axis('off')
+  # plt.tight_layout()
+  # plt.show()
+
   """
   Uncomment For veiwing a graph for visualizing threshold selection
   plt.subplot(144)
